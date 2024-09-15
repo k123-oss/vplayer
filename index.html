@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('your-background-image.jpg') no-repeat center center fixed; /* Update with your background image */
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #fff;
+        }
+        .player-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            width: 400px;
+            text-align: center;
+        }
+        .controls {
+            margin: 10px 0;
+        }
+        .button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            margin: 0 5px;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+        }
+        .button svg {
+            width: 24px;
+            height: 24px;
+            fill: #007bff;
+            margin-right: 5px;
+        }
+        .button:hover svg {
+            fill: #0056b3;
+        }
+        .video-player {
+            width: 100%;
+            height: 200px; /* Adjust as needed */
+            background: #000;
+            margin-bottom: 10px;
+        }
+        .settings {
+            margin-top: 10px;
+        }
+        .settings select, .settings input {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-right: 10px;
+        }
+        .aspect-ratio {
+            margin-top: 10px;
+        }
+        .aspect-ratio label {
+            margin-right: 10px;
+        }
+        .upload {
+            margin-top: 10px;
+        }
+        .upload input {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .playlist, .favorites {
+            margin-top: 10px;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .playlist ul, .favorites ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .playlist li, .favorites li {
+            cursor: pointer;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+            color: #000; /* Set text color to black */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .playlist li:hover, .favorites li:hover {
+            background: #e0e0e0;
+        }
+        .favorite-btn, .delete-all-btn {
+            background: #ff9800;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 5px;
+        }
+        .favorite-btn:hover, .delete-all-btn:hover {
+            background: #e68900;
+        }
+        .credit {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+        .credit a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .credit a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="player-container">
+        <video id="video" class="video-player" controls>
+            <source src="1.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="controls">
+            <button class="button" id="prev">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 6l-6 6 6 6V6z"/></svg>
+                Previous
+            </button>
+            <button class="button" id="backward">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 13.5v-3l-4 1.5 4 1.5zm-6 0v-3l-4 1.5 4 1.5z"/></svg>
+                Backward
+            </button>
+            <button class="button" id="play">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
+                Play
+            </button>
+            <button class="button" id="forward">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 13.5v-3l4 1.5-4 1.5zm6 0v-3l4 1.5-4 1.5z"/></svg>
+                Forward
+            </button>
+            <button class="button" id="next">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 18l6-6-6-6v12z"/></svg>
+                Next
+            </button>
+        </div>
+        <div class="settings">
+            <label for="speed">Playback Speed:</label>
+            <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1">
+            <span id="speed-label">1x</span>
+        </div>
+        <div class="aspect-ratio">
+            <label for="ratio">Aspect Ratio:</label>
+            <select id="ratio">
+                <option value="16:9" selected>16:9</option>
+                <option value="4:3">4:3</option>
+                <option value="1:1">1:1</option>
+                <option value="21:9">21:9</option>
+            </select>
+        </div>
+        <div class="upload">
+            <label for="file-upload">Upload Video:</label>
+            <input type="file" id="file-upload" accept="video/mp4" multiple>
+        </div>
+        <div class="playlist" id="playlist">
+            <h3>Playlist</h3>
+            <ul id="video-list">
+                <!-- Dynamic video list will be inserted here -->
+            </ul>
+            <button class="delete-all-btn" id="delete-all">Delete All</button>
+        </div>
+        <div class="favorites" id="favorites">
+            <h3>Favorites</h3>
+            <ul id="favorites-list">
+                <!-- Favorite video list will be inserted here -->
+            </ul>
+        </div>
+        <div class="credit">
+            Created by <a href="https://www.instagram.com/__kaushalkumar__/" target="_blank">@__kaushalkumar__</a>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const playButton = document.getElementById('play');
+        const nextButton = document.getElementById('next');
+        const prevButton = document.getElementById('prev');
+        const forwardButton = document.getElementById('forward');
+        const backwardButton = document.getElementById('backward');
+        const speedSlider = document.getElementById('speed');
+        const speedLabel = document.getElementById('speed-label');
+        const ratioSelect = document.getElementById('ratio');
+        const fileUpload = document.getElementById('file-upload');
+        const videoList = document.getElementById('video-list');
+        const favoritesList = document.getElementById('favorites-list');
+        const deleteAllButton = document.getElementById('delete-all');
+        let currentTrackIndex = -1;
+        let videos = []; // Array to hold video URLs
+        let videoNames = []; // Array to hold video names
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || []; // Load favorites from local storage
+
+        function playVideo() {
+            if (video.paused) {
+                video.play();
+                playButton.querySelector('svg').setAttribute('viewBox', '0 0 24 24');
+                playButton.querySelector('path').setAttribute('d', 'M8 5v14l11-7z');
+            } else {
+                video.pause();
+                playButton.querySelector('svg').setAttribute('viewBox', '0 0 24 24');
+                playButton.querySelector('path').setAttribute('d', 'M6 19l12-7L6 5v14z');
+            }
+        }
+
+        function changeVideo(offset) {
+            if (videos.length === 0) return;
+            currentTrackIndex += offset;
+            if (currentTrackIndex < 0) currentTrackIndex = 0;
+            if (currentTrackIndex >= videos.length) currentTrackIndex = videos.length - 1;
+            video.src = videos[currentTrackIndex];
+            video.play();
+            playButton.querySelector('svg').setAttribute('viewBox', '0 0 24 24');
+            playButton.querySelector('path').setAttribute('d', 'M8 5v14l11-7z');
+        }
+
+        function changeSpeed() {
+            video.playbackRate = parseFloat(speedSlider.value);
+            speedLabel.textContent = `${speedSlider.value}x`;
+        }
+
+        function handleFileUpload(event) {
+            const files = event.target.files;
+            if (files.length) {
+                for (const file of files) {
+                    const url = URL.createObjectURL(file);
+                    videos.push(url);
+                    videoNames.push(file.name); // Save the original filename
+                }
+                saveVideosToLocalStorage();
+                updatePlaylist();
+            }
+        }
+
+        function saveVideosToLocalStorage() {
+            localStorage.setItem('videos', JSON.stringify(videos));
+            localStorage.setItem('videoNames', JSON.stringify(videoNames));
+        }
+
+        function loadVideosFromLocalStorage() {
+            const savedVideos = JSON.parse(localStorage.getItem('videos')) || [];
+            const savedVideoNames = JSON.parse(localStorage.getItem('videoNames')) || [];
+            videos = savedVideos;
+            videoNames = savedVideoNames;
+            updatePlaylist();
+        }
+
+        function updatePlaylist() {
+            videoList.innerHTML = '';
+            videoNames.forEach((name, index) => {
+                const li = document.createElement('li');
+                li.textContent = truncateName(name);
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.className = 'favorite-btn';
+                deleteBtn.onclick = () => removeVideo(index);
+                const favBtn = document.createElement('button');
+                favBtn.textContent = 'Favorite';
+                favBtn.className = 'favorite-btn';
+                favBtn.onclick = () => addToFavorites(index);
+                li.appendChild(deleteBtn);
+                li.appendChild(favBtn);
+                li.onclick = () => {
+                    video.src = videos[index];
+                    video.play();
+                    currentTrackIndex = index;
+                };
+                videoList.appendChild(li);
+            });
+        }
+
+        function removeVideo(index) {
+            videos.splice(index, 1);
+            videoNames.splice(index, 1);
+            saveVideosToLocalStorage();
+            updatePlaylist();
+        }
+
+        function removeAllVideos() {
+            videos = [];
+            videoNames = [];
+            saveVideosToLocalStorage();
+            updatePlaylist();
+        }
+
+        function addToFavorites(index) {
+            const videoName = videoNames[index];
+            if (!favorites.includes(videoName)) {
+                favorites.push(videoName);
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+                updateFavorites();
+            }
+        }
+
+        function updateFavorites() {
+            favoritesList.innerHTML = '';
+            favorites.forEach((name) => {
+                const li = document.createElement('li');
+                li.textContent = truncateName(name);
+                favoritesList.appendChild(li);
+            });
+        }
+
+        function truncateName(name) {
+            const words = name.split(' ');
+            return words.slice(0, 4).join(' ') + (words.length > 4 ? '...' : '');
+        }
+
+        function changeAspectRatio() {
+            const ratio = ratioSelect.value;
+            switch (ratio) {
+                case '16:9':
+                    video.style.aspectRatio = '16 / 9';
+                    break;
+                case '4:3':
+                    video.style.aspectRatio = '4 / 3';
+                    break;
+                case '1:1':
+                    video.style.aspectRatio = '1 / 1';
+                    break;
+                case '21:9':
+                    video.style.aspectRatio = '21 / 9';
+                    break;
+                default:
+                    video.style.aspectRatio = '16 / 9';
+            }
+        }
+
+        speedSlider.addEventListener('input', changeSpeed);
+        ratioSelect.addEventListener('change', changeAspectRatio);
+        fileUpload.addEventListener('change', handleFileUpload);
+        playButton.addEventListener('click', playVideo);
+        nextButton.addEventListener('click', () => changeVideo(1));
+        prevButton.addEventListener('click', () => changeVideo(-1));
+        forwardButton.addEventListener('click', () => video.currentTime += 10);
+        backwardButton.addEventListener('click', () => video.currentTime -= 10);
+        deleteAllButton.addEventListener('click', removeAllVideos);
+
+        // Load saved videos and favorites on page load
+        loadVideosFromLocalStorage();
+        updateFavorites();
+    </script>
+</body>
+</html>
